@@ -21,8 +21,8 @@ import cv2
 from mouth_ectraction.lipreading_video import Video
 
 
-SOURCE_PATH = 'input/s1/1.MP4'
-SOURCE_EXTS =  'out.avi'
+SOURCE_PATH = 'main/'
+SOURCE_EXTS =  '*.mp4'
 TARGET_PATH = 'output/'
 
 FACE_PREDICTOR_PATH = './shape_predictor_68_face_landmarks.dat'
