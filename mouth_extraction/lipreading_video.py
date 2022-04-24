@@ -4,7 +4,6 @@ https://www.jianshu.com/p/11cb4ce51b14
 '''
 import os
 import numpy as np
-from keras import backend as K
 from scipy import ndimage
 from scipy.misc import imresize
 import skvideo.io
@@ -47,12 +46,10 @@ class Video(object):
         mouth_frames = self.get_frames_mouth(detector, predictor, frames)
         self.face = np.array(frames)
         self.mouth = np.array(mouth_frames)
-        self.set_data(mouth_frames)
 
     def process_frames_mouth(self, frames):
         self.face = np.array(frames)
         self.mouth = np.array(frames)
-        self.set_data(frames)
 
     def get_frames_mouth(self, detector, predictor, frames):
         MOUTH_WIDTH = 112  # 100
@@ -66,12 +63,17 @@ class Video(object):
             for k, d in enumerate(dets):
                 shape = predictor(frame, d)
                 i = -1
-            if shape is None: # Detector doesn't detect face, just return as is
-                return frames
+            if shape is None:
+				mouth_frames=[]
+				for frame in frames
+					frame_gray = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
+					frame_gray = cv2.resize(frame_gray, (112,112))
+					mouth_frames.append(frame_gray)	
+                return mouth_frames
             mouth_points = []
             for part in shape.parts():
                 i += 1
-                if i < 48: # Only take mouth region
+                if i < 48: # point 48-68 Only take mouth region
                     continue
                 mouth_points.append((part.x,part.y))
             np_mouth_points = np.array(mouth_points)
@@ -95,7 +97,7 @@ class Video(object):
             mouth_b = int(mouth_centroid_norm[1] + MOUTH_HEIGHT / 2)
 
             mouth_crop_image = resized_img[mouth_t:mouth_b, mouth_l:mouth_r]
-            #mouth_crop_image = cv2.cvtColor(mouth_crop_image, cv2.COLOR_RGB2GRAY)  # 该语句是所有的图片进行了灰度转换
+            mouth_crop_image = cv2.cvtColor(mouth_crop_image, cv2.COLOR_RGB2GRAY)  
             mouth_frames.append(mouth_crop_image)
         return mouth_frames
 
@@ -104,16 +106,3 @@ class Video(object):
         frames = np.array([frame for frame in videogen])
         return frames
 
-    def set_data(self, frames):
-        data_frames = []
-        for frame in frames:
-            frame = frame.swapaxes(0,1) # swap width and height to form format W x H x C
-            if len(frame.shape) < 3:
-                frame = np.array([frame]).swapaxes(0,2).swapaxes(0,1) # Add grayscale channel
-            data_frames.append(frame)
-        frames_n = len(data_frames)
-        data_frames = np.array(data_frames) # T x W x H x C
-        if K.image_data_format() == 'channels_first':
-            data_frames = np.rollaxis(data_frames, 3) # C x T x W x H
-        self.data = data_frames
-        self.length = frames_n
