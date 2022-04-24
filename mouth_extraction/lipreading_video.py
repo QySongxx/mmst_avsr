@@ -63,13 +63,6 @@ class Video(object):
             for k, d in enumerate(dets):
                 shape = predictor(frame, d)
                 i = -1
-            if shape is None:
-				mouth_frames=[]
-				for frame in frames
-					frame_gray = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
-					frame_gray = cv2.resize(frame_gray, (112,112))
-					mouth_frames.append(frame_gray)	
-                return mouth_frames
             mouth_points = []
             for part in shape.parts():
                 i += 1
