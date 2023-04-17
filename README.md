@@ -1,5 +1,5 @@
 # mmst_avsr
-This is the official repository of the following paper. The more details will be released soon.
+This is the official repository of the following paper. The more details.
 
 @ARTICLE{9755926,
   author={Song, Qiya and Sun, Bin and Li, Shutao},
